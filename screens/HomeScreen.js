@@ -6,7 +6,7 @@ import Carousel from 'react-native-snap-carousel';
 const {width} = Dimensions.get('window');
 const ITEM_WIDTH = width * 0.72;
 
-export default function HomeScreen(){
+export default function HomeScreen({ navigation }){
     const [trendingMovies, setTrendingMovies] = useState([]);
     const [upcomingMovies, setUpcomingMovies] = useState([]);
     const [topRatedMovies, setTopRatedMovies] = useState([]);
@@ -53,36 +53,92 @@ export default function HomeScreen(){
         }
     };
 
-    const renderMovieItem = ({item}) => (
-        <TouchableOpacity style={styles.movieCard}>
-            <Image
-                source={{
-                    uri: `https://image.tmdb.org/t/p/w500${item.poster_path}`
-                }}
-                style={styles.movieImage}
-                loading="lazy"
-                fadeDuration={300}
-                cachePolicy="memory-disk"
-            />
-        </TouchableOpacity>
-    );
+    const renderMovieItem = ({item}) => {
+        const formattedMovie = {
+            poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+            title: item.title,
+            year: new Date(item.release_date).getFullYear(),
+            duration: item.runtime || 120, // Default duration since TMDB doesn't provide it in list view
+            genres: item.genre_ids?.map(id => getGenreName(id)) || [],
+            description: item.overview,
+            cast: [], // We'll need to fetch this separately
+        };
 
-    const MovieCard = React.memo(({ item }) => (
-        <TouchableOpacity style={styles.smallMovieCard}>
-            <Image
-                source={{
-                    uri: `https://image.tmdb.org/t/p/w500${item.poster_path}`
+        return (
+            <TouchableOpacity 
+                style={styles.movieCard}
+                onPress={async () => {
+                    const details = await fetchMovieDetails(item.id);
+                    if (details) {
+                        const formattedMovie = {
+                            poster: `https://image.tmdb.org/t/p/w500${details.poster_path}`,
+                            title: details.title,
+                            year: new Date(details.release_date).getFullYear(),
+                            duration: details.runtime,
+                            genres: details.genres.map(g => g.name),
+                            description: details.overview,
+                            cast: details.cast,
+                            rating: details.vote_average.toFixed(1),
+                        };
+                        navigation.navigate('Movie', { movie: formattedMovie });
+                    }
                 }}
-                style={styles.smallMovieImage}
-                loading="lazy"
-                fadeDuration={300}
-                cachePolicy="memory-disk"
-            />
-            <Text style={styles.smallMovieTitle} numberOfLines={1}>
-                {item.title}
-            </Text>
-        </TouchableOpacity>
-    ));
+            >
+                <Image
+                    source={{ uri: formattedMovie.poster }}
+                    style={styles.movieImage}
+                    loading="lazy"
+                    fadeDuration={300}
+                    cachePolicy="memory-disk"
+                />
+            </TouchableOpacity>
+        );
+    };
+
+    const MovieCard = React.memo(({ item }) => {
+        const formattedMovie = {
+            poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+            title: item.title,
+            year: new Date(item.release_date).getFullYear(),
+            duration: item.runtime || 120,
+            genres: item.genre_ids?.map(id => getGenreName(id)) || [],
+            description: item.overview,
+            cast: [],
+        };
+
+        return (
+            <TouchableOpacity 
+                style={styles.smallMovieCard}
+                onPress={async () => {
+                    const details = await fetchMovieDetails(item.id);
+                    if (details) {
+                        const formattedMovie = {
+                            poster: `https://image.tmdb.org/t/p/w500${details.poster_path}`,
+                            title: details.title,
+                            year: new Date(details.release_date).getFullYear(),
+                            duration: details.runtime,
+                            genres: details.genres.map(g => g.name),
+                            description: details.overview,
+                            cast: details.cast,
+                            rating: details.vote_average.toFixed(1),
+                        };
+                        navigation.navigate('Movie', { movie: formattedMovie });
+                    }
+                }}
+            >
+                <Image
+                    source={{ uri: formattedMovie.poster }}
+                    style={styles.smallMovieImage}
+                    loading="lazy"
+                    fadeDuration={300}
+                    cachePolicy="memory-disk"
+                />
+                <Text style={styles.smallMovieTitle} numberOfLines={1}>
+                    {item.title}
+                </Text>
+            </TouchableOpacity>
+        );
+    });
 
     const MovieList = React.memo(({ title, data }) => (
         <View style={styles.movieSection}>
@@ -101,6 +157,54 @@ export default function HomeScreen(){
             </ScrollView>
         </View>
     ));
+
+    const getGenreName = (genreId) => {
+        const genres = {
+            28: 'Action',
+            12: 'Adventure',
+            16: 'Animation',
+            35: 'Comedy',
+            80: 'Crime',
+            99: 'Documentary',
+            18: 'Drama',
+            10751: 'Family',
+            14: 'Fantasy',
+            36: 'History',
+            27: 'Horror',
+            10402: 'Music',
+            9648: 'Mystery',
+            10749: 'Romance',
+            878: 'Science Fiction',
+            10770: 'TV Movie',
+            53: 'Thriller',
+            10752: 'War',
+            37: 'Western'
+        };
+        return genres[genreId] || 'Unknown';
+    };
+
+    const fetchMovieDetails = async (movieId) => {
+        try {
+            const [movieResponse, creditsResponse] = await Promise.all([
+                fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=2bd579dccedea6421279acb41d1adc7d`),
+                fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=2bd579dccedea6421279acb41d1adc7d`)
+            ]);
+
+            const movieData = await movieResponse.json();
+            const creditsData = await creditsResponse.json();
+
+            return {
+                ...movieData,
+                cast: creditsData.cast.slice(0, 10).map(actor => ({
+                    name: actor.name,
+                    photo: `https://image.tmdb.org/t/p/w200${actor.profile_path}`
+                }))
+            };
+        } catch (error) {
+            console.error('Error fetching movie details:', error);
+            return null;
+        }
+    };
 
     return(
         <ScrollView 
