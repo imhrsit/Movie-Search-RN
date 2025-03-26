@@ -55,6 +55,7 @@ export default function HomeScreen({ navigation }){
 
     const renderMovieItem = ({item}) => {
         const formattedMovie = {
+            id: item.id,
             poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
             title: item.title,
             year: new Date(item.release_date).getFullYear(),
@@ -71,6 +72,7 @@ export default function HomeScreen({ navigation }){
                     const details = await fetchMovieDetails(item.id);
                     if (details) {
                         const formattedMovie = {
+                            id: item.id,
                             poster: `https://image.tmdb.org/t/p/w500${details.poster_path}`,
                             title: details.title,
                             year: new Date(details.release_date).getFullYear(),
@@ -97,6 +99,7 @@ export default function HomeScreen({ navigation }){
 
     const MovieCard = React.memo(({ item }) => {
         const formattedMovie = {
+            id: item.id,
             poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
             title: item.title,
             year: new Date(item.release_date).getFullYear(),
@@ -113,6 +116,7 @@ export default function HomeScreen({ navigation }){
                     const details = await fetchMovieDetails(item.id);
                     if (details) {
                         const formattedMovie = {
+                            id: item.id,
                             poster: `https://image.tmdb.org/t/p/w500${details.poster_path}`,
                             title: details.title,
                             year: new Date(details.release_date).getFullYear(),
