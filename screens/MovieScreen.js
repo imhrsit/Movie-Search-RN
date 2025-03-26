@@ -1,10 +1,10 @@
 import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
 
-export default function RestaurantScreen(){
+export default function MovieScreen(){
     return(
         <View style={styles.container}>
-            <Text style={{ color: 'black' }}>Restaurant Screen</Text>
+            <Text style={{ color: 'black' }}>Movie Screen</Text>
         </View>
     );
 }
