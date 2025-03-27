@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         padding: 16,
         position: 'absolute',
-        top: 10,
+        top: 30,
         left: 0,
         right: 0,
         zIndex: 1,
