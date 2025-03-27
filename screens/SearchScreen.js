@@ -1,6 +1,7 @@
 import {View, Text, StyleSheet, Image, TextInput, TouchableOpacity, FlatList} from 'react-native';
 import React, {useState} from 'react';
 import { Feather } from '@expo/vector-icons';
+import { TMDB_BASE_URL, TMDB_API_KEY } from '../config';
 
 export default function SearchScreen({ navigation }){
     const [searchQuery, setSearchQuery] = useState('');
@@ -16,7 +17,7 @@ export default function SearchScreen({ navigation }){
         setIsLoading(true);
         try {
             const response = await fetch(
-                `https://api.themoviedb.org/3/search/movie?api_key=2bd579dccedea6421279acb41d1adc7d&query=${encodeURIComponent(query)}`
+                `${TMDB_BASE_URL}/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`
             );
             const data = await response.json();
             setSearchResults(data.results);
@@ -30,8 +31,8 @@ export default function SearchScreen({ navigation }){
     const fetchMovieDetails = async (movieId) => {
         try {
             const [movieResponse, creditsResponse] = await Promise.all([
-                fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=2bd579dccedea6421279acb41d1adc7d`),
-                fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=2bd579dccedea6421279acb41d1adc7d`)
+                fetch(`${TMDB_BASE_URL}/3/movie/${movieId}?api_key=${TMDB_API_KEY}`),
+                fetch(`${TMDB_BASE_URL}/3/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`)
             ]);
 
             const movieData = await movieResponse.json();

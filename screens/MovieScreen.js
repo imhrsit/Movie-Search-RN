@@ -2,6 +2,7 @@ import {View, Text, StyleSheet, Image, ScrollView, TouchableOpacity} from 'react
 import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons'; // Make sure to install this package
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {TMDB_BASE_URL, TMDB_API_KEY} from '../config';
 
 export default function MovieScreen({ route, navigation }){
     const { movie } = route.params;
@@ -16,7 +17,7 @@ export default function MovieScreen({ route, navigation }){
     const fetchSimilarMovies = async () => {
         try {
             const response = await fetch(
-                `https://api.themoviedb.org/3/movie/${movie.id}/similar?api_key=2bd579dccedea6421279acb41d1adc7d`
+                `${TMDB_BASE_URL}/3/movie/${movie.id}/similar?api_key=${TMDB_API_KEY}`
             );
             const data = await response.json();
             setSimilarMovies(data.results);
@@ -57,8 +58,8 @@ export default function MovieScreen({ route, navigation }){
     const fetchMovieDetails = async (movieId) => {
         try {
             const [movieResponse, creditsResponse] = await Promise.all([
-                fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=2bd579dccedea6421279acb41d1adc7d`),
-                fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=2bd579dccedea6421279acb41d1adc7d`)
+                fetch(`${TMDB_BASE_URL}/3/movie/${movieId}?api_key=${TMDB_API_KEY}`),
+                fetch(`${TMDB_BASE_URL}/3/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`)
             ]);
 
             const movieData = await movieResponse.json();
@@ -162,7 +163,7 @@ export default function MovieScreen({ route, navigation }){
                             onPress={async () => {
                                 try {
                                     const response = await fetch(
-                                        `https://api.themoviedb.org/3/person/${actor.id}?api_key=2bd579dccedea6421279acb41d1adc7d`
+                                        `${TMDB_BASE_URL}/3/person/${actor.id}?api_key=${TMDB_API_KEY}`
                                     );
                                     const castDetails = await response.json();
                                     navigation.navigate('Cast', { 

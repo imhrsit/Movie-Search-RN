@@ -2,6 +2,7 @@ import {View, Text, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView}
 import React, {useState, useEffect} from 'react';
 import { Feather } from '@expo/vector-icons';
 import Carousel from 'react-native-snap-carousel';
+import { TMDB_API_KEY, TMDB_BASE_URL } from '../config';
 
 const {width} = Dimensions.get('window');
 const ITEM_WIDTH = width * 0.72;
@@ -20,7 +21,7 @@ export default function HomeScreen({ navigation }){
     const getTrendingMovies = async () => {
         try {
             const response = await fetch(
-                'https://api.themoviedb.org/3/trending/movie/week?api_key=2bd579dccedea6421279acb41d1adc7d'
+                `${TMDB_BASE_URL}/3/trending/movie/week?api_key=${TMDB_API_KEY}`
             );
             const data = await response.json();
             setTrendingMovies(data.results);
@@ -32,7 +33,7 @@ export default function HomeScreen({ navigation }){
     const getUpcomingMovies = async () => {
         try {
             const response = await fetch(
-                'https://api.themoviedb.org/3/movie/upcoming?api_key=2bd579dccedea6421279acb41d1adc7d'
+                `${TMDB_BASE_URL}/3/movie/upcoming?api_key=${TMDB_API_KEY}`
             );
             const data = await response.json();
             setUpcomingMovies(data.results);
@@ -44,7 +45,7 @@ export default function HomeScreen({ navigation }){
     const getTopRatedMovies = async () => {
         try {
             const response = await fetch(
-                'https://api.themoviedb.org/3/movie/top_rated?api_key=2bd579dccedea6421279acb41d1adc7d'
+                `${TMDB_BASE_URL}/3/movie/top_rated?api_key=${TMDB_API_KEY}`
             );
             const data = await response.json();
             setTopRatedMovies(data.results);
@@ -190,8 +191,8 @@ export default function HomeScreen({ navigation }){
     const fetchMovieDetails = async (movieId) => {
         try {
             const [movieResponse, creditsResponse] = await Promise.all([
-                fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=2bd579dccedea6421279acb41d1adc7d`),
-                fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=2bd579dccedea6421279acb41d1adc7d`)
+                fetch(`${TMDB_BASE_URL}/3/movie/${movieId}?api_key=${TMDB_API_KEY}`),
+                fetch(`${TMDB_BASE_URL}/3/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`)
             ]);
 
             const movieData = await movieResponse.json();
@@ -219,9 +220,7 @@ export default function HomeScreen({ navigation }){
             initialNumToRender={5}
         >
             <View style={styles.appBar}>
-                <TouchableOpacity>
-                    <Feather name="menu" size={24} color="white" />
-                </TouchableOpacity>
+                <View style={{width: 24}} />
                 <View style={styles.titleContainer}>
                     <Text style={styles.appBarTitleYellow}>M</Text>
                     <Text style={styles.appBarTitleWhite}>ovies</Text>
@@ -277,12 +276,12 @@ const styles = StyleSheet.create({
     },
     appBarTitleYellow: {
         color: '#FFD700',
-        fontSize: 24,
+        fontSize: 27,
         fontWeight: 'bold',
     },
     appBarTitleWhite: {
         color: '#fff',
-        fontSize: 24,
+        fontSize: 27,
         fontWeight: 'bold',
     },
     header: {
