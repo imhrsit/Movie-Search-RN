@@ -1,13 +1,16 @@
 import {View, Text, StyleSheet, Image, ScrollView, TouchableOpacity} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons'; // Make sure to install this package
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function MovieScreen({ route, navigation }){
     const { movie } = route.params;
     const [similarMovies, setSimilarMovies] = useState([]);
+    const [isWishlisted, setIsWishlisted] = useState(false);
 
     useEffect(() => {
         fetchSimilarMovies();
+        checkWishlistStatus();
     }, []);
 
     const fetchSimilarMovies = async () => {
@@ -19,6 +22,35 @@ export default function MovieScreen({ route, navigation }){
             setSimilarMovies(data.results);
         } catch (error) {
             console.error('Error fetching similar movies:', error);
+        }
+    };
+
+    const checkWishlistStatus = async () => {
+        try {
+            const wishlist = await AsyncStorage.getItem('wishlist');
+            const wishlistArray = wishlist ? JSON.parse(wishlist) : [];
+            setIsWishlisted(wishlistArray.some(item => item.id === movie.id));
+        } catch (error) {
+            console.error('Error checking wishlist status:', error);
+        }
+    };
+
+    const toggleWishlist = async () => {
+        try {
+            const wishlist = await AsyncStorage.getItem('wishlist');
+            const wishlistArray = wishlist ? JSON.parse(wishlist) : [];
+
+            if (isWishlisted) {
+                const newWishlist = wishlistArray.filter(item => item.id !== movie.id);
+                await AsyncStorage.setItem('wishlist', JSON.stringify(newWishlist));
+            } else {
+                wishlistArray.push(movie);
+                await AsyncStorage.setItem('wishlist', JSON.stringify(wishlistArray));
+            }
+
+            setIsWishlisted(!isWishlisted);
+        } catch (error) {
+            console.error('Error updating wishlist:', error);
         }
     };
 
@@ -35,8 +67,9 @@ export default function MovieScreen({ route, navigation }){
             return {
                 ...movieData,
                 cast: creditsData.cast.slice(0, 10).map(actor => ({
+                    id: actor.id,
                     name: actor.name,
-                    photo: `https://image.tmdb.org/t/p/w200${actor.profile_path}`
+                    photo: actor.profile_path ? `https://image.tmdb.org/t/p/w200${actor.profile_path}` : null
                 }))
             };
         } catch (error) {
@@ -82,8 +115,12 @@ export default function MovieScreen({ route, navigation }){
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Icon name="chevron-back" size={32} color="#FFA500" />
                 </TouchableOpacity>
-                <TouchableOpacity>
-                    <Icon name="heart-outline" size={32} color="white" />
+                <TouchableOpacity onPress={toggleWishlist}>
+                    <Icon 
+                        name={isWishlisted ? "heart" : "heart-outline"} 
+                        size={32} 
+                        color={isWishlisted ? "red" : "white"} 
+                    />
                 </TouchableOpacity>
             </View>
 
@@ -119,13 +156,29 @@ export default function MovieScreen({ route, navigation }){
                 <Text style={styles.sectionTitle}>Top Cast</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.castContainer}>
                     {movie.cast?.map((actor, index) => (
-                        <View key={index} style={styles.castMember}>
+                        <TouchableOpacity 
+                            key={index} 
+                            style={styles.castMember}
+                            onPress={async () => {
+                                try {
+                                    const response = await fetch(
+                                        `https://api.themoviedb.org/3/person/${actor.id}?api_key=2bd579dccedea6421279acb41d1adc7d`
+                                    );
+                                    const castDetails = await response.json();
+                                    navigation.navigate('Cast', { 
+                                        cast: castDetails
+                                    });
+                                } catch (error) {
+                                    console.error('Error fetching cast details:', error);
+                                }
+                            }}
+                        >
                             <Image
                                 source={{ uri: actor.photo }}
                                 style={styles.castPhoto}
                             />
                             <Text style={styles.castName}>{actor.name}</Text>
-                        </View>
+                        </TouchableOpacity>
                     ))}
                 </ScrollView>
 

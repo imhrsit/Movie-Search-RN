@@ -6,6 +6,7 @@ import React from 'react';
 import HomeScreen from '../screens/HomeScreen';
 import RestaurantScreen from '../screens/MovieScreen';
 import MovieScreen from '../screens/MovieScreen';
+import CastScreen from '../screens/CastScreen';
 
 export default function Navigation(){
     return(
@@ -13,6 +14,7 @@ export default function Navigation(){
         <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Movie" component={MovieScreen} />
+            <Stack.Screen name="Cast" component={CastScreen} />
         </Stack.Navigator>
         </NavigationContainer>
     )
