@@ -2,6 +2,13 @@
 
 A React Native mobile application for searching and exploring movies with a clean UI and smooth animations.
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a04375ea-b181-443a-bba8-a5d24b5d732c" width="22%" />
+  <img src="https://github.com/user-attachments/assets/983ce72e-97a3-41c1-82a7-952550f8d530" width="22%" />
+  <img src="https://github.com/user-attachments/assets/702ca48d-5859-44d9-8652-54f07d0ebd4e" width="22%" />
+  <img src="https://github.com/user-attachments/assets/b82d2545-4e2c-430e-b862-9eb5b9d95b98" width="22%" />
+</p>
+
 🚀 Features
 
 	•	✅ Movie search functionality
