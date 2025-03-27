@@ -226,7 +226,7 @@ export default function HomeScreen({ navigation }){
                     <Text style={styles.appBarTitleYellow}>M</Text>
                     <Text style={styles.appBarTitleWhite}>ovies</Text>
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('Search')}>
                     <Feather name="search" size={24} color="white" />
                 </TouchableOpacity>
             </View>
