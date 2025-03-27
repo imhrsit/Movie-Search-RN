@@ -54,7 +54,7 @@ export default function CastScreen({ route, navigation }){
                     <Icon 
                         name={isWishlisted ? "heart" : "heart-outline"} 
                         size={32} 
-                        color={isWishlisted ? "red" : "white"} 
+                        color={isWishlisted ? "white" : "white"} 
                     />
                 </TouchableOpacity>
             </View>
@@ -132,7 +132,7 @@ export default function CastScreen({ route, navigation }){
 const styles = StyleSheet.create({
     background: {
         flex: 1,
-        backgroundColor: '#1F1D2B',
+        backgroundColor: '#333333',
     },
     header: {
         flexDirection: 'row',

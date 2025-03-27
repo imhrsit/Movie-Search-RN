@@ -260,7 +260,7 @@ export default function HomeScreen({ navigation }){
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1F1D2B',
+        backgroundColor: '#333333',
     },
     appBar: {
         flexDirection: 'row',
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingTop: 35,
         paddingBottom: 10,
-        backgroundColor: '#1F1D2B',
+        backgroundColor: '#333333',
     },
     titleContainer: {
         flexDirection: 'row',

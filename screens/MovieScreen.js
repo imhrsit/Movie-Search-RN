@@ -201,7 +201,7 @@ export default function MovieScreen({ route, navigation }){
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1F1D2B',
+        backgroundColor: '#333333',
     },
     header: {
         flexDirection: 'row',
