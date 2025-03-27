@@ -11,6 +11,12 @@ export default function HomeScreen({ navigation }){
     const [trendingMovies, setTrendingMovies] = useState([]);
     const [upcomingMovies, setUpcomingMovies] = useState([]);
     const [topRatedMovies, setTopRatedMovies] = useState([]);
+    const [page, setPage] = useState({
+        trending: 1,
+        upcoming: 1,
+        topRated: 1
+    });
+    const [isLoading, setIsLoading] = useState(false);
     
     useEffect(() => {
         getTrendingMovies();
@@ -18,39 +24,77 @@ export default function HomeScreen({ navigation }){
         getTopRatedMovies();
     }, []);
 
-    const getTrendingMovies = async () => {
+    const getTrendingMovies = async (loadMore = false) => {
         try {
             const response = await fetch(
-                `${TMDB_BASE_URL}/3/trending/movie/week?api_key=${TMDB_API_KEY}`
+                `${TMDB_BASE_URL}/3/trending/movie/week?api_key=${TMDB_API_KEY}&page=${page.trending}`
             );
             const data = await response.json();
-            setTrendingMovies(data.results);
+            setTrendingMovies(prev => loadMore ? [...prev, ...data.results] : data.results);
         } catch (error) {
             console.error('Error fetching movies:', error);
         }
     };
 
-    const getUpcomingMovies = async () => {
+    const getUpcomingMovies = async (loadMore = false) => {
         try {
             const response = await fetch(
-                `${TMDB_BASE_URL}/3/movie/upcoming?api_key=${TMDB_API_KEY}`
+                `${TMDB_BASE_URL}/3/movie/upcoming?api_key=${TMDB_API_KEY}&page=${page.upcoming}`
             );
             const data = await response.json();
-            setUpcomingMovies(data.results);
+            setUpcomingMovies(prev => loadMore ? [...prev, ...data.results] : data.results);
         } catch (error) {
             console.error('Error fetching upcoming movies:', error);
         }
     };
 
-    const getTopRatedMovies = async () => {
+    const getTopRatedMovies = async (loadMore = false) => {
         try {
             const response = await fetch(
-                `${TMDB_BASE_URL}/3/movie/top_rated?api_key=${TMDB_API_KEY}`
+                `${TMDB_BASE_URL}/3/movie/top_rated?api_key=${TMDB_API_KEY}&page=${page.topRated}`
             );
             const data = await response.json();
-            setTopRatedMovies(data.results);
+            setTopRatedMovies(prev => loadMore ? [...prev, ...data.results] : data.results);
         } catch (error) {
             console.error('Error fetching top rated movies:', error);
+        }
+    };
+
+    const loadMore = async () => {
+        if (isLoading) return;
+        
+        try {
+            setIsLoading(true);
+            
+            // Increment pages
+            const newPage = {
+                trending: page.trending + 1,
+                upcoming: page.upcoming + 1,
+                topRated: page.topRated + 1
+            };
+            setPage(newPage);
+
+            // Fetch new data with updated page numbers
+            const [trendingResponse, upcomingResponse, topRatedResponse] = await Promise.all([
+                fetch(`${TMDB_BASE_URL}/3/trending/movie/week?api_key=${TMDB_API_KEY}&page=${newPage.trending}`),
+                fetch(`${TMDB_BASE_URL}/3/movie/upcoming?api_key=${TMDB_API_KEY}&page=${newPage.upcoming}`),
+                fetch(`${TMDB_BASE_URL}/3/movie/top_rated?api_key=${TMDB_API_KEY}&page=${newPage.topRated}`)
+            ]);
+
+            const [trendingData, upcomingData, topRatedData] = await Promise.all([
+                trendingResponse.json(),
+                upcomingResponse.json(),
+                topRatedResponse.json()
+            ]);
+
+            // Update state with new data
+            setTrendingMovies(prev => [...prev, ...trendingData.results]);
+            setUpcomingMovies(prev => [...prev, ...upcomingData.results]);
+            setTopRatedMovies(prev => [...prev, ...topRatedData.results]);
+        } catch (error) {
+            console.error('Error loading more movies:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -211,6 +255,50 @@ export default function HomeScreen({ navigation }){
         }
     };
 
+    const MovieGrid = React.memo(({ movies }) => {
+        // Remove duplicates and add a unique identifier for the source
+        const uniqueMovies = [...new Map(movies.map(movie => [movie.id, movie])).values()];
+        
+        return (
+            <View style={styles.gridContainer}>
+                {uniqueMovies.map((item) => (
+                    <TouchableOpacity 
+                        key={item.id}
+                        style={styles.gridCard}
+                        onPress={async () => {
+                            const details = await fetchMovieDetails(item.id);
+                            if (details) {
+                                const formattedMovie = {
+                                    id: item.id,
+                                    poster: `https://image.tmdb.org/t/p/w500${details.poster_path}`,
+                                    title: details.title,
+                                    year: new Date(details.release_date).getFullYear(),
+                                    duration: details.runtime,
+                                    genres: details.genres.map(g => g.name),
+                                    description: details.overview,
+                                    cast: details.cast,
+                                    rating: details.vote_average.toFixed(1),
+                                };
+                                navigation.navigate('Movie', { movie: formattedMovie });
+                            }
+                        }}
+                    >
+                        <Image
+                            source={{ 
+                                uri: `https://image.tmdb.org/t/p/w500${item.poster_path}`
+                            }}
+                            style={styles.gridImage}
+                            loading="lazy"
+                        />
+                        <Text style={styles.gridMovieTitle} numberOfLines={1}>
+                            {item.title}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+        );
+    });
+
     return(
         <ScrollView 
             style={styles.container}
@@ -218,6 +306,18 @@ export default function HomeScreen({ navigation }){
             maxToRenderPerBatch={5}
             windowSize={5}
             initialNumToRender={5}
+            onScroll={({nativeEvent}) => {
+                const {layoutMeasurement, contentOffset, contentSize} = nativeEvent;
+                const paddingToBottom = 50;
+                const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= 
+                    contentSize.height - paddingToBottom;
+                
+                if (isCloseToBottom && !isLoading) {
+                    console.log('Loading more movies...'); // Debug log
+                    loadMore();
+                }
+            }}
+            scrollEventThrottle={16}
         >
             <View style={styles.appBar}>
                 <View style={{width: 24}} />
@@ -252,6 +352,15 @@ export default function HomeScreen({ navigation }){
 
             <MovieList title="Upcoming" data={upcomingMovies} />
             <MovieList title="Top Rated" data={topRatedMovies} />
+            
+            <Text style={[styles.header, { marginTop: 20 }]}>Now Streaming</Text>
+            <MovieGrid movies={[...trendingMovies, ...upcomingMovies, ...topRatedMovies]} />
+            
+            {isLoading && (
+                <View style={styles.loadingContainer}>
+                    <Text style={styles.loadingText}>Loading more movies...</Text>
+                </View>
+            )}
         </ScrollView>
     );
 }
@@ -334,6 +443,36 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     smallMovieTitle: {
+        color: '#fff',
+        fontSize: 14,
+        width: '100%',
+    },
+    loadingContainer: {
+        padding: 20,
+        alignItems: 'center',
+    },
+    loadingText: {
+        color: '#FFD700',
+        fontSize: 16,
+    },
+    gridContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        paddingBottom: 20,
+    },
+    gridCard: {
+        width: (width - 48) / 2, // 2 columns with 16px padding on sides and 16px between
+        marginBottom: 20,
+    },
+    gridImage: {
+        width: '100%',
+        height: ((width - 48) / 2) * 1.5, // Maintain aspect ratio
+        borderRadius: 16,
+        marginBottom: 8,
+    },
+    gridMovieTitle: {
         color: '#fff',
         fontSize: 14,
         width: '100%',
