@@ -11,20 +11,20 @@ A React Native mobile application for searching and exploring movies with a clea
 
 🚀 Features
 
-	•	✅ Movie search functionality
-	•	✅ Responsive UI with NativeWind (TailwindCSS)
-	•	✅ Smooth animations using React Native Reanimated
-	•	✅ Carousel display with react-native-snap-carousel
-	•	✅ Local storage support with AsyncStorage
-	•	✅ Beautiful vector icons with React Native Vector Icons
+	• ✅ Movie search functionality
+	• ✅ Responsive UI with NativeWind (TailwindCSS)
+	• ✅ Smooth animations using React Native Reanimated
+	• ✅ Carousel display with react-native-snap-carousel
+	• ✅ Local storage support with AsyncStorage
+	• ✅ Beautiful vector icons with React Native Vector Icons
 
 🛠️ Prerequisites
 
 Before you begin, ensure you have the following installed:
 
-	•	Node.js (v14 or higher)
-	•	Expo CLI
-	•	Git
+	• Node.js (v14 or higher)
+	• Expo CLI
+	• Git
 
 📦 Installation
 
@@ -57,13 +57,13 @@ npm run web
 
 🏗️ Tech Stack
 
-	•	React Native
-	•	Expo
-	•	NativeWind (TailwindCSS)
-	•	React Navigation
-	•	React Native Reanimated
-	•	AsyncStorage
-	•	React Native Vector Icons
+	• React Native
+	• Expo
+	• NativeWind (TailwindCSS)
+	• React Navigation
+	• React Native Reanimated
+	• AsyncStorage
+	• React Native Vector Icons
 
 📁 Project Structure
 
@@ -83,26 +83,26 @@ movie-search/
 
 The project uses the following main dependencies:
 
-	•	expo: ~52.0.40
-	•	react: 18.3.1
-	•	react-native: 0.76.7
-	•	nativewind: ^4.1.23
-	•	@react-navigation/native: ^7.0.19
-	•	react-native-reanimated: ^3.16.1
-	•	And more! (Check package.json for the complete list.)
+	• expo: ~52.0.40
+	• react: 18.3.1
+	• react-native: 0.76.7
+	• nativewind: ^4.1.23
+	• @react-navigation/native: ^7.0.19
+	• react-native-reanimated: ^3.16.1
+	• And more! (Check package.json for the complete list.)
 
 👨‍💻 Development
 
 To start development:
 
-	1.	Ensure all prerequisites are installed.
-	2.	Follow the installation steps.
-	3.	Run the app using:
+	1. Ensure all prerequisites are installed.
+	2. Follow the installation steps.
+	3. Run the app using:
 
 npm start
 
 
-	4.	Use the Expo Go app or an emulator to test the application.
+	4. Use the Expo Go app or an emulator to test the application.
 
 🛠️ Troubleshooting
 
@@ -127,10 +127,10 @@ This project is MIT Licensed. Feel free to use, modify, and distribute it.
 
 Contributions are welcome! If you’d like to contribute:
 
-	1.	Fork the repository
-	2.	Create a new branch (feature/your-feature)
-	3.	Commit your changes
-	4.	Open a pull request
+	1. Fork the repository
+	2. Create a new branch (feature/your-feature)
+	3. Commit your changes
+	4. Open a pull request
 
 🔗 Follow me on GitHub: @imhrsit
 
